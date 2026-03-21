@@ -2,17 +2,6 @@ name: Publish To Comfy Registry
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "pyproject.toml"
-      - "requirements.txt"
-      - "install.py"
-      - "__init__.py"
-      - "backend/**"
-      - "web/**"
-      - "assets/**"
 
 jobs:
   publish:
@@ -29,6 +18,15 @@ jobs:
 
       - name: Install Comfy CLI
         run: pip install comfy-cli
+
+      - name: Validate Registry Secret
+        env:
+          COMFY_API_KEY: ${{ secrets.COMFY_API_KEY }}
+        run: |
+          if [ -z "$COMFY_API_KEY" ]; then
+            echo "COMFY_API_KEY is not configured. Add it in GitHub Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
 
       - name: Publish Node
         env:
